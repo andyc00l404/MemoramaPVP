@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorama PVP - Juego Multijugador</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji:wght@400&display=swap');
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Pantalla de Inicio -->
+        <div id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h1>Memorama PVP</h1>
+                    <p class="subtitle">Juega contra otros jugadores en tiempo real</p>
+                </div>
+                
+                <div class="form-container">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="player-name" placeholder="¿Cómo te llamas?" maxlength="20">
+                    </div>
+                    
+                    <button id="search-game-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-search"></i>
+                        Buscar Partida
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Espera -->
+        <div id="waiting-screen" class="screen">
+            <div class="waiting-content">
+                <div class="loading-animation">
+                    <div class="spinner"></div>
+                    <h2>Buscando oponente...</h2>
+                    <p>Esperando a que otro jugador se una</p>
+                </div>
+                <button id="cancel-search-btn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Match Encontrado -->
+        <div id="match-found-screen" class="screen">
+            <div class="match-content">
+                <div class="match-animation">
+                    <div class="pulse-effect">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h2>¡Match Encontrado!</h2>
+                    <div class="players-match">
+                        <div class="player-match-card">
+                            <div class="player-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span id="player1-match-name">Tú</span>
+                        </div>
+                        <div class="vs-indicator">
+                            <span>VS</span>
+                        </div>
+                        <div class="player-match-card">
+                            <div class="player-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span id="player2-match-name">Oponente</span>
+                        </div>
+                    </div>
+                    <p class="countdown">Selecciona tu categoría favorita</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Selección de Categoría -->
+        <div id="category-selection-screen" class="screen">
+            <div class="category-selection-content">
+                <div class="selection-header">
+                    <h2>Selecciona una categoría</h2>
+                    <p>Tu oponente también está eligiendo...</p>
+                </div>
+                
+                <div class="categories-grid">
+                    <div class="category-card" data-category="animales">
+                        <div class="category-emoji">🐾</div>
+                        <span>Animales</span>
+                    </div>
+                    <div class="category-card" data-category="frutas">
+                        <div class="category-emoji">🍎</div>
+                        <span>Frutas</span>
+                    </div>
+                    <div class="category-card" data-category="paises">
+                        <div class="category-emoji">🌍</div>
+                        <span>Países</span>
+                    </div>
+                    <div class="category-card" data-category="transporte">
+                        <div class="category-emoji">🚗</div>
+                        <span>Transporte</span>
+                    </div>
+                </div>
+                
+                <div class="selection-status">
+                    <div class="status-item">
+                        <i class="fas fa-check-circle" id="my-selection-status"></i>
+                        <span>Tu selección</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock" id="opponent-selection-status"></i>
+                        <span>Oponente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Resultado de Categoría -->
+        <div id="category-result-screen" class="screen">
+            <div class="category-result-content">
+                <div class="result-animation">
+                    <div class="category-display">
+                        <div class="category-emoji-large" id="final-category-emoji">🎯</div>
+                        <h2 id="final-category-name">Categoría Seleccionada</h2>
+                    </div>
+                    
+                    <div class="selection-details">
+                        <div class="detail-item">
+                            <span class="label">Tu elección:</span>
+                            <span class="value" id="my-category-choice">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Oponente eligió:</span>
+                            <span class="value" id="opponent-category-choice">-</span>
+                        </div>
+                        <div class="detail-item highlight" id="random-result" style="display: none;">
+                            <span class="label">🎲 Sorteo:</span>
+                            <span class="value">¡Se eligió al azar!</span>
+                        </div>
+                    </div>
+                    
+                    <p class="countdown">El juego comenzará en <span id="game-countdown">4</span> segundos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla del Juego -->
+        <div id="game-screen" class="screen">
+            <!-- Header del juego -->
+            <div class="game-header">
+                <div class="game-info">
+                    <div class="category-display">
+                        <span id="current-category">Categoría</span>
+                    </div>
+                    <div class="game-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="game-timer">00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de jugadores -->
+            <div class="players-info">
+                <div class="player-card current-player" id="player1-info">
+                    <div class="player-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="player-details">
+                        <div class="player-name" id="player1-name">Jugador 1</div>
+                        <div class="player-score">
+                            <i class="fas fa-star"></i>
+                            <span id="player1-score">0</span>
+                        </div>
+                    </div>
+                    <div class="turn-indicator" id="player1-turn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                
+                <div class="vs-indicator">
+                    <span>VS</span>
+                </div>
+                
+                <div class="player-card" id="player2-info">
+                    <div class="player-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="player-details">
+                        <div class="player-name" id="player2-name">Jugador 2</div>
+                        <div class="player-score">
+                            <i class="fas fa-star"></i>
+                            <span id="player2-score">0</span>
+                        </div>
+                    </div>
+                    <div class="turn-indicator" id="player2-turn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tablero de juego -->
+            <div class="game-board-container">
+                <div class="game-board" id="game-board">
+                    <!-- Las cartas se generarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Controles del juego -->
+            <div class="game-controls">
+                <div class="turn-indicator-large" id="current-turn-indicator">
+                    <i class="fas fa-hand-pointer"></i>
+                    <span id="current-turn-text">Tu turno</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Resultado -->
+        <div id="result-screen" class="screen">
+            <div class="result-content">
+                <div class="result-animation">
+                    <div class="trophy-container">
+                        <i class="fas fa-trophy" id="result-trophy"></i>
+                    </div>
+                    <h2 id="result-title">¡Juego Terminado!</h2>
+                    <div class="final-scores">
+                        <div class="score-item">
+                            <span class="player-name" id="result-player1-name">Jugador 1</span>
+                            <span class="score" id="result-player1-score">0</span>
+                        </div>
+                        <div class="score-separator">-</div>
+                        <div class="score-item">
+                            <span class="player-name" id="result-player2-name">Jugador 2</span>
+                            <span class="score" id="result-player2-score">0</span>
+                        </div>
+                    </div>
+                    <div class="result-message" id="result-message">¡Empate!</div>
+                </div>
+                
+                <div class="result-actions">
+                    <button id="play-again-btn" class="btn btn-primary">
+                        <i class="fas fa-redo"></i>
+                        Jugar de Nuevo
+                    </button>
+                    <button id="new-game-btn" class="btn btn-secondary">
+                        <i class="fas fa-home"></i>
+                        Nueva Partida
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones -->
+        <div id="notifications" class="notifications-container"></div>
+
+        <!-- Modal de Solicitud de Jugar de Nuevo -->
+        <div id="play-again-modal" class="modal">
+            <div class="modal-content">
+                <h3>Jugar de Nuevo</h3>
+                <p id="play-again-message">¿Quieres jugar otra partida con el mismo oponente?</p>
+                <div class="modal-actions">
+                    <button id="accept-play-again" class="btn btn-primary">
+                        <i class="fas fa-check"></i>
+                        Aceptar
+                    </button>
+                    <button id="decline-play-again" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Rechazar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "memorama-pvp",
+  "version": "1.0.0",
+  "description": "Juego de Memorama PVP en tiempo real con Socket.IO",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["memorama", "pvp", "socket.io", "html5", "game"],
+  "author": "Tu nombre",
+  "license": "MIT"
+}
